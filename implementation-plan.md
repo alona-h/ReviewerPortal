@@ -282,7 +282,7 @@ Mocks `IUniversityService`.
 
 - API `Dockerfile`: SDK 8.0 build stage → ASP.NET 8.0 runtime.
 - Frontend `Dockerfile`: Node 20 Alpine build with `ARG VITE_API_BASE_URL` baked at build time → nginx:alpine.
-- `docker-compose.yml`: API on `5000:8080`; frontend on `5173:80` built with `VITE_API_BASE_URL: http://localhost:5000`; frontend `depends_on` api; API reads `UniversityApiBaseUrl` from environment.
+- `docker-compose.yml`: API on `5050:8080`; frontend on `5173:80` built with `VITE_API_BASE_URL: http://localhost:5050`; frontend `depends_on` api; API reads `UniversityApiBaseUrl` from environment.
 - Root `.env`: `UNIVERSITY_API_BASE_URL=<university_api_base_url>
 
 **Deliverable:** `docker-compose up --build` starts both containers; frontend reaches backend.
@@ -300,7 +300,7 @@ Mocks `IUniversityService`.
 | 5 | Concurrent university inserts | Two simultaneous registrations can both miss the DB check. | Unique index on `University.UniversityName` + catch `DbUpdateException`, detach and re-query. |
 | 6 | CORS allowed origins | Spec says "CORS Enabled" without specifying origins. | `AllowAnyOrigin` for development. |
 | 7 | Frontend API base URL in Docker | Vue bakes `VITE_API_BASE_URL` at build time. | Build-time `ARG` passed via `docker-compose.yml` `args`. |
-| 8 | Backend HTTP port in Docker | .NET 8 default internal port is `8080`. | Mapped as `5000:8080`. |
+| 8 | Backend HTTP port in Docker | .NET 8 default internal port is `8080`. | Mapped as `5050:8080`. |
 | 9 | Transaction scope | If university saves but user save fails, university record is orphaned. | Single `AppDbContext` per request via DI. Spec does not require rollback of university on user failure. |
 | 10 | HTTP response body for errors | Spec says "error message" without defining the shape. | `{ "error": "<message>" }` — consistent across 400, 404, and 500. |
 | 11 | Eligibility — publications threshold | Spec: `NumberOfPublications > 3`. | Strictly greater than 3; exactly 3 is not eligible. |
