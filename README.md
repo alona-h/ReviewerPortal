@@ -43,30 +43,36 @@ Reviewer Portal is a full-stack application for registering academic users and i
 
 ### Backend
 
-```bash
-dotnet run --project ReviewerPortal.API
-```
+1. Set the university API URL in [`ReviewerPortal.API/appsettings.json`](ReviewerPortal.API/appsettings.json):
+   ```json
+   {
+     "UniversityApiBaseUrl": "https://your-university-api.example.com"
+   }
+   ```
 
-Set `UniversityApiBaseUrl` in `appsettings.json` before running:
+2. Run the API:
+   ```bash
+   dotnet run --project ReviewerPortal.API --launch-profile https
+   ```
 
-```json
-{
-  "UniversityApiBaseUrl": "https://your-university-api.example.com"
-}
-```
-
-| Profile | URL                        |
-|---------|----------------------------|
-| HTTPS   | https://localhost:7221     |
-| HTTP    | http://localhost:5071      |
+| Profile | URL                            |
+|---------|--------------------------------|
+| HTTPS   | https://localhost:7221         |
+| HTTP    | http://localhost:5071          |
 | Swagger | https://localhost:7221/swagger |
 
 ### Frontend
 
-```bash
-cd ReviewerPortalWeb
-npm run dev
-```
+1. Install dependencies:
+   ```bash
+   cd ReviewerPortalWeb
+   npm install
+   ```
+
+2. Start the dev server:
+   ```bash
+   npm run dev
+   ```
 
 The dev server starts at **http://localhost:5173** and proxies API calls to `https://localhost:7221` (configured in [`ReviewerPortalWeb/.env`](ReviewerPortalWeb/.env)).
 
