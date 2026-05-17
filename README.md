@@ -29,12 +29,13 @@ Reviewer Portal is a full-stack application for registering academic users and i
    docker-compose up --build
    ```
 
-| Service  | URL                      |
-|----------|--------------------------|
-| API      | http://localhost:5000    |
-| Frontend | http://localhost:5173    |
+| Service  | URL                           |
+|----------|-------------------------------|
+| API      | http://localhost:5050         |
+| Swagger  | http://localhost:5050/swagger |
+| Frontend | http://localhost:5173         |
 
-> The frontend is built with `VITE_API_BASE_URL=http://localhost:5000` baked in at image build time.
+> The frontend is built with `VITE_API_BASE_URL=http://localhost:5050` baked in at image build time.
 
 ---
 
@@ -46,12 +47,12 @@ Reviewer Portal is a full-stack application for registering academic users and i
 dotnet run --project ReviewerPortal.API
 ```
 
-Set `UniversityApiBaseUrl` before running (environment variable or `appsettings.Development.json`):
+Set `UniversityApiBaseUrl` in `appsettings.json` before running:
 
-```bash
-# PowerShell
-$env:UniversityApiBaseUrl = <university_api_base_url>
-dotnet run --project ReviewerPortal.API
+```json
+{
+  "UniversityApiBaseUrl": "https://your-university-api.example.com"
+}
 ```
 
 | Profile | URL                        |
@@ -148,12 +149,11 @@ Evaluates whether a registered user meets reviewer eligibility criteria:
 
 ## Architecture
 
-The backend follows Clean Layered Architecture — Controllers delegate to Services, Services coordinate with Repositories and an external HTTP client.
+The backend follows Clean Layered Architecture — Controllers delegate to Services, which coordinate directly with the database and an external HTTP client.
 
 - **Controllers** (`ReviewerPortal.API/Controllers/`) — HTTP routing and model binding; no business logic.
-- **Services** (`Application/Services/`) — `UserService` handles registration and invitation eligibility; `UniversityService` resolves university names first from a local database cache, then from the external API.
-- **Repositories** (`Infrastructure/Persistence/Repositories/`) — EF Core wrappers over `AppDbContext`, backed by an in-memory database.
-- **External API** — `UniversityService` calls `GET /v1/organizations/elasticSuggestions` via a named `HttpClient` (`"UniversityApi"`) to resolve university names and scores.
+- **Services** (`Application/Services/`) — `UserService` handles registration and invitation eligibility; `UniversityService` resolves university names first from a local database cache, then from the external API. Both services query `AppDbContext` directly, backed by an in-memory database.
+- **External API** — `UniversityService` calls `GET /v1/organizations/elasticSuggestions` via `IUniversityApiClient` (a named `HttpClient` registered as `"UniversityApi"`) to resolve university names and scores.
 - **Frontend** (`ReviewerPortalWeb/`) — Vue 3 Composition API; all API calls are centralised in `src/services/api.js` using an Axios instance.
 
 Cross-cutting: a global `IExceptionHandler` maps `BadRequestException` → 400 and `NotFoundException` → 404.
